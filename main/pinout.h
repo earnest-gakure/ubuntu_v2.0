@@ -96,6 +96,7 @@ extern unsigned long state_entry_time;
 extern MFRC522 mfrc522; // RFID reader instance
 extern String scanned_tag_id; // Variable to store the scanned RFID tag ID
 extern bool tag_scanned; // Flag to indicate if a tag has been scanned
+extern bool rfid_initiated;
 
 #endif
 

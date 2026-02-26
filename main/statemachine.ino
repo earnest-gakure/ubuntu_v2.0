@@ -20,6 +20,7 @@ void state_machine_init() {
   input_index = 0;
   selected_tap_index = -1;
   tag_scanned = false; // Reset the tag scanned flag
+  rfid_initiated = false; // Reset the RFID initiated flag
 }
 
 /**
@@ -46,6 +47,8 @@ void update_state(){
         case HOME_IDLE:
             // Stay in home idle until a key is pressed or tag is tapped
             if(tag_scanned) { // If an RFID tag has been scanned
+                tag_scanned = false; // Reset the tag scanned flag
+                rfid_initiated = true; // Set the RFID initiated flag to indicate a tag was scanned
                 current_state = WAITING_FOR_TAP_OR_KEY; // Transition to waiting for tap or key state
                 state_entry_time = millis(); // Record the time when entering this state for timeout handling
                 input_index = 0; // Reset input index for any potential input   
@@ -56,14 +59,13 @@ void update_state(){
         case ENTER_PHONE:
             // Wait for user to enter phone number, then transition to ENTER_AMOUNT
             if(input_index == 10) { // Assuming phone number is 10 digits
-                if(tag_scanned) { // If a tag was scanned while entering phone number, transition to waiting for tap or key state
-                    tag_scanned = false; // Reset the tag scanned flag
+                if(rfid_initiated) { // If a tag was scanned while entering phone number, transition to waiting for tap or key state
                     current_state = ENTER_AMOUNT; // Transition to waiting for tap or key state
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for any potential input   
                     lcd.clear(); // Clear the LCD display
                     lcd.setCursor(input_index, 1);
-                    lcd.blink_on(); // Blink cursor to indicate input position for amount entry
+                    lcd.blink_off(); // Blink cursor to indicate input position for amount entry
                     lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); // Update LCD to show amount entry prompt
                 }
                 else {

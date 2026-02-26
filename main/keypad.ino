@@ -80,7 +80,7 @@ void handle_idle_keypress(char key) {
         lcddisplay("Enter Phone Number", phone_buffer, "", "* CANCEL"); // Update LCD to show phone number entry prompt
         lcd.setCursor(input_index, 1);
         lcd.blink_on(); // Blink cursor to indicate input position for phone number entry
-        
+        rfid_initiated = false; 
     }
 }
 
@@ -211,5 +211,9 @@ void reset_input_buffer(){
     input_index = 0; // Reset input index
     memset(amount_buffer, 0, sizeof(amount_buffer)); // Clear amount buffer 
     selected_tap_index = -1; // Reset selected tap index
+    rfid_initiated = false; // Reset RFID initiated flag
+    tag_scanned = false; // Reset tag scanned flag
+    
+
 
 }

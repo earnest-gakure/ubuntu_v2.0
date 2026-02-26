@@ -8,7 +8,7 @@
 MFRC522 mfrc522(53, 34); // Create MFRC522 instance with SS pin 53 and RST pin 34
 String scanned_tag_id = ""; // Variable to store the scanned RFID tag ID
 bool tag_scanned = false; // Flag to indicate if a tag has been scanned
-
+bool rfid_initiated = false; // Flag to indicate if RFID reader has been initialized
 
 /**
  * @function to initialize the RFID reader          
