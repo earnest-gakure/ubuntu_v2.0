@@ -62,6 +62,8 @@ void update_state(){
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for any potential input   
                     lcd.clear(); // Clear the LCD display
+                    lcd.setCursor(input_index, 1);
+                    lcd.blink_on(); // Blink cursor to indicate input position for amount entry
                     lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); // Update LCD to show amount entry prompt
                 }
                 else {
@@ -69,6 +71,7 @@ void update_state(){
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for amount entry
                     lcd.clear(); // Clear the LCD display
+                    lcd.blink_off(); // Turn off cursor blinking
                     lcddisplay("Select Tap", "", "", "* CANCEL"); // Update LCD to show tap selection prompt 
                     }
             }

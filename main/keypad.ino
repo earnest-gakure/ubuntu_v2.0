@@ -195,7 +195,7 @@ void handle_key_in_waiting_tap_or_key(char key){
         current_state = ENTER_PHONE; // Transition back to home idle state after confirming with key press
         state_entry_time = millis(); // Record the time when entering this state for timeout handling
         lcd.clear(); // Clear the LCD display
-        lcddisplay("Enter phone number", phone_buffer, "Enter Amount", "* CANCEL #OK"); // Update LCD to show amount entry prompt with phone number displayed
+        lcddisplay("Enter phone number", phone_buffer, "", "* CANCEL #OK"); // Update LCD to show amount entry prompt with phone number displayed
         lcd.setCursor(input_index, 1); // Move cursor to third line to show amount as it's being entered
         lcd.blink_on(); // Blink cursor to indicate input position for amount entry
         handle_phone_number_input(key); // Handle the first digit of amount input
