@@ -11,8 +11,12 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <Keypad.h>
+#include <MFRC522.h>   
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
+#define PAUSE_TIMEOUT 180000 //3 minutes in milliseconds
+#define STATEMACHINE_TIMEOUT 45000 // 45 seconds timeout for user input in state machine
+
 
 
 
@@ -70,7 +74,6 @@ typedef struct {
 } Tap;
 
 extern Tap taps[NUM_OF_TAPS];
-#define PAUSE_TIMEOUT 180000 //3 minutes in milliseconds
 
 //keypad pin definitions and global variables
 extern char phone_buffer[11]; 
@@ -78,17 +81,21 @@ extern char amount_buffer[5];
 extern uint8_t input_index;
 
 //state machine global variables
-enum systenstates {HOME_IDLE, ENTER_PHONE, ENTER_AMOUNT, ENTER_TAP};
+enum systenstates {HOME_IDLE, ENTER_PHONE, ENTER_AMOUNT, ENTER_TAP, WAITING_FOR_TAP_OR_KEY};
 extern systenstates current_state;
 
 //mpesa global variables
 #define BUFFER_SIZE 256
-#define STATEMACHINE_TIMEOUT 120000 // 60 seconds timeout for user input in state machine
 extern char mpesa_phone_number[11];
 extern char mpesa_amount[5];
 extern uint8_t selected_tap_index;
 extern uint8_t input_index;
 extern unsigned long state_entry_time;
+
+//RFID global variables
+extern MFRC522 mfrc522; // RFID reader instance
+extern String scanned_tag_id; // Variable to store the scanned RFID tag ID
+extern bool tag_scanned; // Flag to indicate if a tag has been scanned
 
 #endif
 

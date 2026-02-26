@@ -4,6 +4,7 @@
  */
 #include "pinout.h"
 #include <Keypad.h>
+#include <MFRC522.h>   
 
 // Keypad configuration
 const byte ROWS = 4; // Four rows
@@ -59,6 +60,10 @@ void keypad_input_handler() {
         case ENTER_TAP:
             // 
             handle_key_in_waiting_tap(key); // Handle key press for waiting for tap state (e.g. allow cancellation with * key)
+            break;
+        case WAITING_FOR_TAP_OR_KEY:
+
+            handle_key_in_waiting_tap_or_key(key); // Handle key press for waiting for tap or key state (e.g. allow cancellation with * key)
             break;
     }
 }
@@ -145,13 +150,16 @@ void handle_amount_input(char key) {
         if(input_index > 0) {
             input_index--;
             amount_buffer[input_index] = '\0'; // Null-terminate after removing last digit
+            lcddisplay("Enter Amount", amount_buffer, "", "* CANCEL #OK"); // Update LCD to show current amount input
+            lcd.setCursor(input_index, 1); // Move cursor to the position of the deleted
             lcd.print(" "); // Clear the character on the LCD
             lcd.setCursor(input_index, 1); // Move cursor back to the position of the deleted digit
-            lcddisplay("Enter Amount", amount_buffer, "", "* CANCEL #OK"); // Update LCD to show current amount input   
         }
         if(input_index == 0) { // If all digits are deleted, show prompt without amount
             current_state = HOME_IDLE; // Transition back to tap selection state if user deletes all amount input
             reset_input_buffer(); // Reset input buffers and variables
+            lcd.blink_off(); // Turn off cursor blinking
+            lcd.clear(); // Clear the LCD display
             lcddisplay("Cancelled", "Returning to Home", "", ""); // Update LCD to show cancellation message
             delay(3000); // Wait for 3 seconds to allow user to read message
             homescreen(); // Show home screen on LCD    
@@ -159,6 +167,8 @@ void handle_amount_input(char key) {
     }else if(key == '#'){
         if(input_index > 0) { // Ensure there is some amount input before proceeding
             current_state = HOME_IDLE; // Transition back to home idle state after confirming amount entry
+            lcd.clear(); // Clear the LCD display
+            lcd.blink_off(); // Turn off cursor blinking
             lcddisplay("Processing Payment", "", "", ""); // Update LCD to show processing message
             delay(2000); // Simulate processing time
             // Here you would add the code to actually process the payment with the entered phone number and amount
@@ -168,6 +178,31 @@ void handle_amount_input(char key) {
 
     }
 }
+/**
+ * @function to handle key press while waiting for tap or key 
+ */
+void handle_key_in_waiting_tap_or_key(char key){
+    if(key == '*'){
+        reset_input_buffer(); // Reset input buffers and variables if transaction is cancelled
+        state_machine_init(); // Reset state machine to home idle
+        lcd.clear(); // Clear the LCD display
+        lcddisplay("Transaction Cancelled", "Returning to Home", "", ""); // Update LCD to show cancellation message
+        delay(3000); // Wait for 3 seconds to allow user to read message
+        homescreen(); // Show home screen on LCD
+    }
+    else if(key >= '0' && key <= '9') {
+        // If a number key is pressed while waiting for tap, treat it as confirmation to proceed with the transaction without tap
+        current_state = ENTER_PHONE; // Transition back to home idle state after confirming with key press
+        state_entry_time = millis(); // Record the time when entering this state for timeout handling
+        lcd.clear(); // Clear the LCD display
+        lcddisplay("Enter phone number", phone_buffer, "Enter Amount", "* CANCEL #OK"); // Update LCD to show amount entry prompt with phone number displayed
+        lcd.setCursor(input_index, 1); // Move cursor to third line to show amount as it's being entered
+        lcd.blink_on(); // Blink cursor to indicate input position for amount entry
+        handle_phone_number_input(key); // Handle the first digit of amount input
+        
+    }
+}   
+
 /**
  * @function to reset input buffer if transaction is cancelled
  */

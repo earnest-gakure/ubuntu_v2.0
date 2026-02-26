@@ -163,7 +163,7 @@ void homescreen() {
   lcd.blink_off();
 
   lcd.clear();
-  lcddisplay("Tap Tag To TOP-UP", "", "Press Tap To Pay", "");
+  lcddisplay("Tap Tag", "", "Enter Phone Number", "");
 }
 
 

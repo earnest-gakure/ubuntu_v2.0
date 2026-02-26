@@ -11,6 +11,7 @@ void setup() {
     buttons_init();
     keypad_init();
     lcd_init();
+    rfid_init();
     welcome_screen_animation();
     delay(500); 
     state_machine_init();
@@ -28,5 +29,6 @@ void loop() {
 
     keypad_input_handler(); // Check for keypad input and update state machine variables accordingly
     update_state(); // Update the state machine based on current state and inputs
+    check_for_rfid_tags(); // Check for RFID tag presence and read its ID to update state machine variables accordingly
 
 }
