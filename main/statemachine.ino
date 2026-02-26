@@ -79,6 +79,10 @@ void update_state(){
             }
         break;
         case ENTER_AMOUNT:
+            // Wait for user to enter amount, then transition to HOME_IDLE after processing payment
+            if(input_index == 4) { // Assuming amount is up to 4 digits
+                lcd.blink_off(); // Turn off cursor blinking
+            }
         
         break;
         case ENTER_TAP:

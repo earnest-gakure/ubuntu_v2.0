@@ -154,6 +154,7 @@ void handle_amount_input(char key) {
             lcd.setCursor(input_index, 1); // Move cursor to the position of the deleted
             lcd.print(" "); // Clear the character on the LCD
             lcd.setCursor(input_index, 1); // Move cursor back to the position of the deleted digit
+            lcd.blink_on(); // Blink cursor to indicate input position
         }
         if(input_index == 0) { // If all digits are deleted, show prompt without amount
             current_state = HOME_IDLE; // Transition back to tap selection state if user deletes all amount input
