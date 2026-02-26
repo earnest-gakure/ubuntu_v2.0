@@ -16,14 +16,15 @@ uint8_t x1 = 0, x2 = 0, x3 = 0, x4 = 0;
 
 void buttons_init() {
   PCICR |= B00000100;  // Enable PCIE2 (PCINT16-23)
+  PCMSK2 |= B00001111;
   Serial.println("Tap button interrupts enabled");
 }
 //pins set up
-uint8_t motor_open_pins[NUM_TAPS] = {motor1_open, motor2_open, motor3_open, motor4_open};
-uint8_t motor_close_pins[NUM_TAPS] = {motor1_close, motor2_close, motor3_close, motor4_close};
-uint8_t led_pins[NUM_TAPS] = {tap_1_led, tap_2_led, tap_3_led, tap_4_led};
-uint8_t flowmeter_pins[NUM_TAPS] = {flowmeter_1, flowmeter_2, flowmeter_3, flowmeter_4};
-uint8_t button_pins[NUM_TAPS] = {A8, A9, A10, A11};
+uint8_t motor_open_pins[NUM_OF_TAPS] = {motor1_open, motor2_open, motor3_open, motor4_open};
+uint8_t motor_close_pins[NUM_OF_TAPS] = {motor1_close, motor2_close, motor3_close, motor4_close};
+uint8_t led_pins[NUM_OF_TAPS] = {tap_1_led, tap_2_led, tap_3_led, tap_4_led};
+uint8_t flowmeter_pins[NUM_OF_TAPS] = {flowmeter_1, flowmeter_2, flowmeter_3, flowmeter_4};
+uint8_t button_pins[NUM_OF_TAPS] = {A8, A9, A10, A11};
 
 void taps_init() {
     for (int i = 0; i < NUM_OF_TAPS; i++) {
@@ -77,7 +78,7 @@ void tap_open(uint8_t tap_index) {
         digitalWrite(taps[tap_index].led_pin, HIGH); // Turn on LED to indicate tap is opening
     }
     //attach flowmeter interrupt here to start counting pulses for flow measurement
-    attachInterrupt(digitalPinToInterrupt(taps[tap_index].flowmeter_pin), flowmeter_isrs[tap_index], FALLING);
+    attachInterrupt(digitalPinToInterrupt(taps[tap_index].flowmeter_pin), flowmeter_ISRs[tap_index], FALLING);
 }
 /**
  * @function to close a tap
@@ -198,18 +199,6 @@ void check_targetpulses_to_autoclose(){
                 Serial.print(i);
                 Serial.println(" automatically closed after reaching target pulses.");
             }
-        }
-    }
-}
-/**
- * @function to clear to clear invalid tap presses (e.g. if a button was pressed but the tap is not running or already paused)
- * @called from main to reset button pressed flags for any taps that are not in a valid state to be paused or resumed       
- */
-void clear_invalid_tap_presses() {
-    for (uint8_t i = 0; i < NUM_OF_TAPS; i++) {
-        if ((taps[i].button_pressed) && 
-            (!taps[i].running && !taps[i].paused)) {
-            taps[i].button_pressed = false; // Reset button pressed flag for invalid presses
         }
     }
 }

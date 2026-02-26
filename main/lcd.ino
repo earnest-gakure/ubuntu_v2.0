@@ -11,6 +11,7 @@ void lcd_init() {
 void lcddisplay(String firstline, String secondline, String thirdline, String fourthline) {
   //This is a generic function that allows you to print messages on the screen on a respective line
   lcd.setCursor(0, 0);
+  //lcd.clear();
   if (firstline == "") {
     lcd.print(" ");
   } else {
@@ -37,16 +38,6 @@ void lcddisplay(String firstline, String secondline, String thirdline, String fo
   } else {
     lcd.print(fourthline);
   }
-}
-
-/**
- * startup display function to show welcome message and system status
- */
-void welcome_screen() {
-  lcd.clear();
-  lcddisplay("   UBUNTU WATERHUB ", "       AFRICA", "       WELCOME", "");
-  delay(2500);
-  lcd.clear();
 }
 
 /**
