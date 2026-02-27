@@ -69,6 +69,7 @@ void update_state(){
                     lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); // Update LCD to show amount entry prompt
                 }
                 else {
+                    selected_tap_index = -1; // Reset selected tap index since we are not coming from a tag scan
                     current_state = ENTER_TAP; // Transition to amount entry state
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for amount entry
@@ -90,6 +91,7 @@ void update_state(){
             for(uint8_t i = 0; i < NUM_OF_TAPS; i++) {
                 if(taps[i].button_pressed) { // If a tap button is pressed
                     selected_tap_index = i; // Set the selected tap index
+                    active_transaction_type[selected_tap_index] = trxmpesapay; // Set the active transaction type for the selected tap to mpesa pay
                     taps[i].button_pressed = false; // Reset the button pressed flag
                     taps[i].pending_open = true; // Set the pending open flag for the selected tap
                     current_state = ENTER_AMOUNT; // Transition to amount entry state
@@ -111,6 +113,7 @@ void update_state(){
             for(uint8_t i = 0; i < NUM_OF_TAPS; i++){
                 if(taps[i].button_pressed) { // If a tap button is pressed
                     selected_tap_index = i; // Set the selected tap index
+                    active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
                     taps[i].button_pressed = false; // Reset the button pressed flag
                     taps[i].pending_open = true; // Set the pending open flag for the selected tap
                     current_state = ENTER_AMOUNT; // Transition to amount entry state

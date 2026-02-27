@@ -22,6 +22,12 @@ void GSM_Net_Connect_Buzz() {  //Indicate that a connection to the GSM network h
   digitalWrite(buzzer_pin, LOW);     // turn the LED off by making the voltage LOW
   delay(50);
 }
+// Double beep — GPRS attached
+void GSM_GPRS_Connect_Buzz() {
+        digitalWrite(buzzer_pin, HIGH); delay(50);
+        digitalWrite(buzzer_pin, LOW);  delay(50);
+
+}
 void Mqtt_Broker_Connect_Buzz() {  //Indicate that a connection to the broker has been established
   for (int x = 0; x < 3; x++) {
     digitalWrite(buzzer_pin, HIGH);  // turn the LED on (HIGH is the voltage level)

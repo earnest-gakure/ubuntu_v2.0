@@ -15,10 +15,16 @@ void setup() {
     welcome_screen_animation();
     delay(500); 
     state_machine_init();
+
+    gsm_init();
+    build_mqtt_topics();
     homescreen();
     
 }
 void loop() {
+
+    //gsm updating
+    gsm_update(); // Drives the GSM connection state machine (non-blocking)
     //tap management
     check_pause_buttons();   // Check if any running taps have their button pressed to pause them
     check_resume_buttons();  // Check if any paused taps have their button pressed to resume them
