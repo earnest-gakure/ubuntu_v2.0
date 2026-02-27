@@ -33,6 +33,10 @@ void check_for_rfid_tags() {
         tag_scanned = true; // Set the flag to indicate that a tag has been scanned
         Serial.print("Scanned RFID Tag ID: ");
         Serial.println(scanned_tag_id); // Print the scanned tag ID to the serial monitor for debugging
+
+        //prevent multiple scans of the same tag in quick succession by adding a small delay
+        mfrc522.PICC_HaltA();
+        mfrc522.PCD_StopCrypto1();
     }
 }
 

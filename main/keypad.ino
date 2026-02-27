@@ -172,6 +172,7 @@ void handle_amount_input(char key) {
                 mqtt_publish_mpesa_pay(phone_buffer, selected_tap_index, amount_buffer);
                 if(publish_flag) {
                     lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Payment Initiated", "Please complete", "payment on your phone", ""); 
                     delay(3000);
                     taps[selected_tap_index].pending_open = true;
@@ -179,6 +180,8 @@ void handle_amount_input(char key) {
                     homescreen();
                 }
                 else {
+                    lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Payment Failed", "Network Error", "Please try again", ""); 
                     delay(3000);
                     current_state = HOME_IDLE;
@@ -190,6 +193,7 @@ void handle_amount_input(char key) {
                 mqtt_publish_card_pay(scanned_tag_id.c_str(), selected_tap_index, amount_buffer); 
                 if(publish_flag) {
                     lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Payment Initiated", "Please wait ...", "", ""); 
                     delay(3000);
                     taps[selected_tap_index].pending_open = true;
@@ -198,6 +202,7 @@ void handle_amount_input(char key) {
                 }
                 else {
                     lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Payment Failed", "Network Error", "Please try again", ""); 
                     delay(3000);
                     current_state = HOME_IDLE;
@@ -209,6 +214,7 @@ void handle_amount_input(char key) {
                 mqtt_publish_card_topup(scanned_tag_id.c_str(), phone_buffer, amount_buffer);  
                 if(publish_flag) {
                     lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Top-up Initiated", "Please wait ...", "", ""); 
                     delay(3000);
                     current_state = HOME_IDLE; 
@@ -216,6 +222,7 @@ void handle_amount_input(char key) {
                 }
                 else {
                     lcd.clear();
+                    lcd.blink_off();
                     lcddisplay("Top-up Failed", "Network Error", "Please try again", ""); 
                     delay(3000);
                     current_state = HOME_IDLE;

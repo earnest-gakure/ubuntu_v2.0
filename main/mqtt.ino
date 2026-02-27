@@ -81,3 +81,20 @@ void mqtt_publish_card_topup(const char* card_id, const char* phone, const char*
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 
+/**
+ * @callback function
+ */
+
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
+    char message[length + 1];
+    memcpy(message, payload, length);
+    message[length] = '\0';
+
+    SerialMon.print(F("[MQTT] Received on "));
+    SerialMon.print(topic);
+    SerialMon.print(F(": "));
+    SerialMon.println(message);
+
+    // TODO: parse message and open/close taps accordingly
+    // e.g. "open_1_100" → tap_open(1), set target_pulses
+}

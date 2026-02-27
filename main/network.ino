@@ -147,6 +147,8 @@ void gsm_update() {
                 if (modem.isGprsConnected()) {
                     SerialMon.println(F("[GSM] GPRS connected ✓"));
                     Mqtt_Broker_Connect_Buzz();   // re-using existing 3-beep signal
+                    mqtt.setServer(broker, mqtt_port);
+                    mqtt.setCallback(mqtt_callback);
                     retry_count   = 0;
                     last_heartbeat = now;
                     _enter_state(GSM_CONNECTED);
@@ -168,8 +170,6 @@ void gsm_update() {
             }
         }
         break;
-
-    // ── Fully connected: periodic health check ────────────────
     case GSM_CONNECTED:
         if (now - last_heartbeat >= HEARTBEAT_INTERVAL) {
             last_heartbeat = now;
@@ -183,9 +183,25 @@ void gsm_update() {
             if (!net || !gprs) {
                 SerialMon.println(F("[GSM] Link lost → reconnecting"));
                 retry_count = 0;
-                // Skip full modem re-init; try GPRS first, then network
                 _enter_state(gprs ? GSM_WAIT_NETWORK : GSM_CONNECT_GPRS);
             }
+        }
+
+        // ── MQTT connection management ────────────────────────────
+        if (!mqtt.connected()) {
+            SerialMon.println(F("[MQTT] Connecting to broker..."));
+            String clientId = "waterhub_";
+            clientId += sim_imei;
+            if (mqtt.connect(clientId.c_str())) {
+                SerialMon.println(F("[MQTT] Connected ✓"));
+                mqtt.subscribe(topic_subscribe);   // Subscribe to command topic
+                Mqtt_Broker_Connect_Buzz();
+            } else {
+                SerialMon.print(F("[MQTT] Connect failed, rc="));
+                SerialMon.println(mqtt.state());
+            }
+        } else {
+            mqtt.loop();  // Keep MQTT client responsive
         }
         break;
 
@@ -262,4 +278,5 @@ static void _get_imei() {
     sim_imei[i] = '\0';
     SerialMon.print(F("[GSM] IMEI: "));
     SerialMon.println(sim_imei);
+    build_mqtt_topics(); // Now that we have the IMEI, build the MQTT topics
 }
