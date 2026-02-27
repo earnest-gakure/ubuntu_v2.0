@@ -89,20 +89,25 @@ void update_state(){
         case ENTER_TAP:
             // Wait for user to select tap or cancel with * key
             for(uint8_t i = 0; i < NUM_OF_TAPS; i++) {
-                if(taps[i].button_pressed) { // If a tap button is pressed
-                    selected_tap_index = i; // Set the selected tap index
-                    active_transaction_type[selected_tap_index] = trxmpesapay; // Set the active transaction type for the selected tap to mpesa pay
-                    taps[i].button_pressed = false; // Reset the button pressed flag
-                    current_state = ENTER_AMOUNT; // Transition to amount entry state
-                    state_entry_time = millis(); // Record the time when entering this state for timeout handling
-                    input_index = 0; // Reset input index for amount entry
-                    lcd.clear(); // Clear the LCD display
-                    lcddisplay("Enter Amount", amount_buffer, "", "* CANCEL #OK"); // Update LCD to show amount entry prompt
-                    lcd.setCursor(input_index, 1); // Move cursor to second line to show amount as it's being entered
-                    lcd.blink_on(); // Blink cursor to indicate input position for amount entry
-                    Serial.print("Selected Tap: ");
-                    Serial.println(i);
-                    break;
+                if(taps[i].button_pressed){
+                    if(!taps[i].running && !taps[i].paused && taps[i].pending_open) { // If the tap is not already running or paused and is pending open, allow selection
+                        selected_tap_index = i; // Set the selected tap index
+                        active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
+                        taps[i].button_pressed = false; // Reset the button pressed flag
+                        current_state = ENTER_AMOUNT; // Transition to amount entry state
+                        state_entry_time = millis(); // Record the time when entering this state for timeout handling
+                        input_index = 0; // Reset input index for amount entry
+                        lcd.clear(); // Clear the LCD display
+                        lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); 
+                        lcd.setCursor(input_index, 1);
+                        lcd.blink_on(); // Blink cursor to indicate input position for amount entry
+                        Serial.print("Selected Tap: ");
+                        Serial.println(i);
+                    }
+                    else {
+                        taps[i].button_pressed = false; // Reset the button pressed flag if tap is not eligible for selection
+                    }
+                    break;          
                 }
             }
 
@@ -110,18 +115,25 @@ void update_state(){
         case WAITING_FOR_TAP_OR_KEY:
             // wait for user to select tap ot enter phone number or cancel with * key
             for(uint8_t i = 0; i < NUM_OF_TAPS; i++){
-                if(taps[i].button_pressed) { // If a tap button is pressed
-                    selected_tap_index = i; // Set the selected tap index
-                    active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
-                    taps[i].button_pressed = false; // Reset the button pressed flag
-                    current_state = ENTER_AMOUNT; // Transition to amount entry state
-                    state_entry_time = millis(); // Record the time when entering this state for timeout handling
-                    input_index = 0; // Reset input index for amount entry
-                    lcd.clear(); // Clear the LCD display
-                    lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); // Update LCD to show amount entry prompt
-                    Serial.print("Selected Tap: ");
-                    Serial.println(i);
-                    break;
+                if(taps[i].button_pressed){
+                    if(!taps[i].running && !taps[i].paused && taps[i].pending_open) { // If the tap is not already running or paused and is pending open, allow selection
+                        selected_tap_index = i; // Set the selected tap index
+                        active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
+                        taps[i].button_pressed = false; // Reset the button pressed flag
+                        current_state = ENTER_AMOUNT; // Transition to amount entry state
+                        state_entry_time = millis(); // Record the time when entering this state for timeout handling
+                        input_index = 0; // Reset input index for amount entry
+                        lcd.clear(); // Clear the LCD display
+                        lcddisplay("Enter Amount", "", "", "* CANCEL #OK"); 
+                        lcd.setCursor(input_index, 1);
+                        lcd.blink_on(); // Blink cursor to indicate input position for amount entry
+                        Serial.print("Selected Tap: ");
+                        Serial.println(i);
+                    }
+                    else {
+                        taps[i].button_pressed = false; // Reset the button pressed flag if tap is not eligible for selection
+                    }
+                    break;          
                 }
 
             }
