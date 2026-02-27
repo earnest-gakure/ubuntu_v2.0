@@ -42,6 +42,7 @@ void check_state_timeouts() {
 /**
  * @function to handle stet machine transitions
  */
+
 void update_state(){
     switch(current_state) {
         case HOME_IDLE:
@@ -92,7 +93,7 @@ void update_state(){
                 if(taps[i].button_pressed){
                     if(!taps[i].running && !taps[i].paused && taps[i].pending_open) { // If the tap is not already running or paused and is pending open, allow selection
                         selected_tap_index = i; // Set the selected tap index
-                        active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
+                        active_transaction_type[selected_tap_index] = trxmpesapay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
                         taps[i].button_pressed = false; // Reset the button pressed flag
                         current_state = ENTER_AMOUNT; // Transition to amount entry state
                         state_entry_time = millis(); // Record the time when entering this state for timeout handling
@@ -116,7 +117,7 @@ void update_state(){
             // wait for user to select tap ot enter phone number or cancel with * key
             for(uint8_t i = 0; i < NUM_OF_TAPS; i++){
                 if(taps[i].button_pressed){
-                    if(!taps[i].running && !taps[i].paused && taps[i].pending_open) { // If the tap is not already running or paused and is pending open, allow selection
+                    if(!taps[i].running && !taps[i].paused && !taps[i].pending_open) { // If the tap is not already running or paused and is pending open, allow selection
                         selected_tap_index = i; // Set the selected tap index
                         active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
                         taps[i].button_pressed = false; // Reset the button pressed flag
