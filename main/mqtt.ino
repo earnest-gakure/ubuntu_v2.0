@@ -20,11 +20,11 @@ String active_transaction_type[4] = {"", "", "", ""};
  * @function to create topics
  */
 void build_mqtt_topics() {
-  strcpy(topic_publish,     "atm/transactions/");    strcat(topic_publish,     imei);
-  strcpy(topic_subscribe,   "atm/commands/");        strcat(topic_subscribe,   imei);
-  strcpy(topic_ack_publish, "atm/acknowledgement/"); strcat(topic_ack_publish, imei);
+  strcpy(topic_publish,     "atm/transactions/");    strcat(topic_publish,     sim_imei);
+  strcpy(topic_subscribe,   "atm/commands/");        strcat(topic_subscribe,   sim_imei);
+  strcpy(topic_ack_publish, "atm/acknowledgement/"); strcat(topic_ack_publish, sim_imei);
   SerialMon.print(F("Topics built for IMEI: "));
-  SerialMon.println(imei);
+  SerialMon.println(sim_imei);
 }
 
 /**
@@ -51,13 +51,8 @@ void mqtt_publish_mpesa_pay(const char* phone,uint8_t tap_index , const char* am
     sprintf(tap_index_str, "%d", tap_index); // Convert tap index to string
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s",
-        "mpesapay",delim,
-        sim_imei,delim,
-        phone,delim,
-        amount,delim,
-        tap_index_str
-    );
+        "%s%s%s%s%s%s%s%s%s",
+        "mpesapay",delim, sim_imei, delim, phone, delim, amount, delim, tap_index_str);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
     
 }
@@ -70,13 +65,8 @@ void mqtt_publish_card_pay(const char* card_id, uint8_t tap_index , const char* 
     sprintf(tap_index_str, "%d", tap_index); // Convert tap index to string
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s",
-        "cardpay",delim,
-        sim_imei,delim,
-        card_id,delim,
-        tap_index_str,delim,
-        amount
-    );
+        "%s%s%s%s%s%s%s%s%s",
+        "cardpay",delim,sim_imei,delim,card_id,delim,tap_index_str,delim, amount);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 /**
@@ -86,13 +76,8 @@ void mqtt_publish_card_topup(const char* card_id, const char* phone, const char*
     char mqttmessage[BUFFER_SIZE];
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s",
-        "cardtopup",delim,
-        sim_imei,delim,
-        card_id,delim,
-        phone,delim,
-        amount
-    );
+        "%s%s%s%s%s%s%s%s%s",
+        "cardtopup",delim,sim_imei,delim, card_id,delim, phone,delim, amount);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 

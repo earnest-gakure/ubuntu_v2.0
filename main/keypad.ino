@@ -170,14 +170,60 @@ void handle_amount_input(char key) {
         if(input_index > 0) { // Ensure there is some amount input before proceeding
             if(active_transaction_type[selected_tap_index] == trxmpesapay) { 
                 mqtt_publish_mpesa_pay(phone_buffer, selected_tap_index, amount_buffer);
+                if(publish_flag) {
+                    lcd.clear();
+                    lcddisplay("Payment Initiated", "Please complete", "payment on your phone", ""); 
+                    delay(3000);
+                    taps[selected_tap_index].pending_open = true;
+                    current_state = HOME_IDLE; 
+                    homescreen();
+                }
+                else {
+                    lcddisplay("Payment Failed", "Network Error", "Please try again", ""); 
+                    delay(3000);
+                    current_state = HOME_IDLE;
+                    reset_input_buffer();
+                    homescreen();
+                }
             }
             else if(active_transaction_type[selected_tap_index] == trxcardpay) { 
                 mqtt_publish_card_pay(scanned_tag_id.c_str(), selected_tap_index, amount_buffer); 
+                if(publish_flag) {
+                    lcd.clear();
+                    lcddisplay("Payment Initiated", "Please wait ...", "", ""); 
+                    delay(3000);
+                    taps[selected_tap_index].pending_open = true;
+                    current_state = HOME_IDLE; 
+                    homescreen();
+                }
+                else {
+                    lcd.clear();
+                    lcddisplay("Payment Failed", "Network Error", "Please try again", ""); 
+                    delay(3000);
+                    current_state = HOME_IDLE;
+                    reset_input_buffer();
+                    homescreen();
+                }
             }
             else if(rfid_initiated && selected_tap_index == -1) {
                 mqtt_publish_card_topup(scanned_tag_id.c_str(), phone_buffer, amount_buffer);  
+                if(publish_flag) {
+                    lcd.clear();
+                    lcddisplay("Top-up Initiated", "Please wait ...", "", ""); 
+                    delay(3000);
+                    current_state = HOME_IDLE; 
+                    homescreen();
+                }
+                else {
+                    lcd.clear();
+                    lcddisplay("Top-up Failed", "Network Error", "Please try again", ""); 
+                    delay(3000);
+                    current_state = HOME_IDLE;
+                    reset_input_buffer();
+                    homescreen();
+                }
             }
-            current_state = HOME_IDLE;
+            
         }
 
     }
@@ -217,5 +263,6 @@ void reset_input_buffer(){
     selected_tap_index = -1; 
     rfid_initiated = false; 
     tag_scanned = false; 
+
 
 }

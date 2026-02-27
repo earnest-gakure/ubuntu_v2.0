@@ -8,7 +8,7 @@ systenstates current_state = HOME_IDLE;   // Initialize the current state to HOM
 char phone_buffer[11] = {0};        // Buffer to store the entered phone number
 char amount_buffer[5] = {0};               // Buffer to store the entered amount
 uint8_t input_index = 0;                  // Index for tracking input position in buffers    
-uint8_t selected_tap_index = -1;          // Variable to track which tap is selected for top-up (initialized to -1 for no selection)
+int8_t selected_tap_index = -1;          // Variable to track which tap is selected for top-up (initialized to -1 for no selection)
 unsigned long state_entry_time = 0;      // Variable to track the time when the current state was entered (for timeout handling)
 /**
  * @function to reset the state machine to the home idle state and clear input buffers
@@ -93,7 +93,6 @@ void update_state(){
                     selected_tap_index = i; // Set the selected tap index
                     active_transaction_type[selected_tap_index] = trxmpesapay; // Set the active transaction type for the selected tap to mpesa pay
                     taps[i].button_pressed = false; // Reset the button pressed flag
-                    taps[i].pending_open = true; // Set the pending open flag for the selected tap
                     current_state = ENTER_AMOUNT; // Transition to amount entry state
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for amount entry
@@ -115,7 +114,6 @@ void update_state(){
                     selected_tap_index = i; // Set the selected tap index
                     active_transaction_type[selected_tap_index] = trxcardpay; // Set the active transaction type for the selected tap to card pay (since they are confirming with tap instead of key, we will treat it as card pay for now)
                     taps[i].button_pressed = false; // Reset the button pressed flag
-                    taps[i].pending_open = true; // Set the pending open flag for the selected tap
                     current_state = ENTER_AMOUNT; // Transition to amount entry state
                     state_entry_time = millis(); // Record the time when entering this state for timeout handling
                     input_index = 0; // Reset input index for amount entry

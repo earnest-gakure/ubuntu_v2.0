@@ -38,7 +38,7 @@ const int   mqtt_port = 1883;
 
 TinyGsm         modem(SerialAT);
 TinyGsmClient   client(modem);
-PubSubClient    mqttClient(client);
+PubSubClient    mqtt(client);
 
 // ── GSM connection manager settings ──────────────────────────
 // Maximum number of soft retries before a hard (pin) reset is attempted
@@ -117,7 +117,7 @@ extern unsigned long state_entry_time;
 #define BUFFER_SIZE 256
 extern char    mpesa_phone_number[11];
 extern char    mpesa_amount[5];
-extern uint8_t selected_tap_index;
+extern int8_t selected_tap_index;
 
 // ── RFID ──────────────────────────────────────────────────────
 extern MFRC522 mfrc522;
@@ -138,12 +138,15 @@ bool gsm_is_connected(); // True when network + GPRS are both up
 char delim[] = "_";
 extern bool publish_flag;
 
-char trxcardpay[8];
-char trxcardtopup[10];
-char trxmpesapay[9];
-char trxremotedispense[15];
+extern char trxcardpay[8];
+extern char trxcardtopup[10];
+extern char trxmpesapay[9];
+extern char trxremotedispense[15];
 
 extern String active_transaction_type[4];
+
+//
+extern bool led_blink_state;
 
 
 

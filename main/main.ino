@@ -14,7 +14,9 @@ void setup() {
     rfid_init();
     welcome_screen_animation();
     delay(500); 
+    loading_screen();
     state_machine_init();
+    timer_init();
 
     gsm_init();
     build_mqtt_topics();
