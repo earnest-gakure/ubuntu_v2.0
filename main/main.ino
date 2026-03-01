@@ -39,4 +39,6 @@ void loop() {
     update_state(); // Update the state machine based on current state and inputs
     check_for_rfid_tags(); // Check for RFID tag presence and read its ID to update state machine variables accordingly
 
+    process_queue();
+
 }

@@ -218,3 +218,22 @@ void status_8_screen() {
   delay(5000);
 }
 
+// //------------**********----------------//
+// //------------ TAG SCREENS ---------------//
+// //------------**********----------------//
+
+void tagID_display_screen() {
+  lcd.clear();
+  //lcddisplay("ID: " + get_cardid(), "", "", "");
+  delay(2500);
+}
+void card_pay_success(String cardbalance) {
+  lcd.clear();
+  lcddisplay("", "SUCCESSFUL", "TOKENS BAL: " + cardbalance, "");
+  delay(3000);
+}
+void card_topup_success(String cardbalance) {
+  lcd.clear();
+  lcddisplay("", "TOP UP SUCCESS", "TOKENS BAL: " + cardbalance, "");
+  delay(3000);
+}

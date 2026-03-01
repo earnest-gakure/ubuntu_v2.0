@@ -81,6 +81,7 @@ void handle_idle_keypress(char key) {
         lcd.setCursor(input_index, 1);
         lcd.blink_on(); // Blink cursor to indicate input position for phone number entry
         rfid_initiated = false; 
+        tag_scanned = false;
         
     }
 }
@@ -169,13 +170,18 @@ void handle_amount_input(char key) {
     }else if(key == '#'){
         if(input_index > 0) { // Ensure there is some amount input before proceeding
             if(active_transaction_type[selected_tap_index] == trxmpesapay) { 
-                mqtt_publish_mpesa_pay(phone_buffer, selected_tap_index, amount_buffer);
+                char txid[TRXID_LEN];
+                generate_txid(txid);
+
+                mqtt_publish_mpesa_pay(phone_buffer, selected_tap_index, amount_buffer, txid);
                 if(publish_flag) {
+                    queue_enqueue(trxmpesapay, selected_tap_index, txid);
                     lcd.clear();
                     lcd.blink_off();
                     lcddisplay("Payment Initiated", "Please complete", "payment on your phone", ""); 
                     delay(3000);
                     taps[selected_tap_index].pending_open = true;
+                    reset_input_buffer();
                     current_state = HOME_IDLE; 
                     homescreen();
                 }
@@ -184,19 +190,23 @@ void handle_amount_input(char key) {
                     lcd.blink_off();
                     lcddisplay("Payment Failed", "Network Error", "Please try again", ""); 
                     delay(3000);
-                    current_state = HOME_IDLE;
                     reset_input_buffer();
+                    current_state = HOME_IDLE;
                     homescreen();
                 }
             }
             else if(active_transaction_type[selected_tap_index] == trxcardpay) { 
-                mqtt_publish_card_pay(scanned_tag_id.c_str(), selected_tap_index, amount_buffer); 
+                char txid[TRXID_LEN];
+                generate_txid(txid);
+                mqtt_publish_card_pay(scanned_tag_id.c_str(), selected_tap_index, amount_buffer, txid); 
                 if(publish_flag) {
+                    queue_enqueue(trxcardpay, selected_tap_index, txid);
                     lcd.clear();
                     lcd.blink_off();
                     lcddisplay("Payment Initiated", "Please wait ...", "", ""); 
                     delay(3000);
                     taps[selected_tap_index].pending_open = true;
+                    reset_input_buffer();
                     current_state = HOME_IDLE; 
                     homescreen();
                 }
@@ -270,6 +280,7 @@ void reset_input_buffer(){
     selected_tap_index = -1; 
     rfid_initiated = false; 
     tag_scanned = false; 
+    scanned_tag_id = "";
 
 
 }

@@ -143,10 +143,43 @@ extern char trxcardtopup[10];
 extern char trxmpesapay[9];
 extern char trxremotedispense[15];
 
-extern String active_transaction_type[4];
+extern String active_transaction_type[NUM_OF_TAPS];
 
 //
 extern bool led_blink_state;
+
+//QUEUE
+#define QUEUE_SIZE 4
+#define TRX_TYPE_LEN 20
+#define TRXID_LEN 8
+
+//QUE ENTRY STATES
+#define QSTATE_EMPTY 0
+#define QSTATE_PENDING 1
+#define QSTATE_RECEIVED 2
+#define QSTATE_PROCESSED 3
+#define QSTATE_EXPIRED 4
+
+typedef struct {
+    uint8_t state;
+    char trx_type[TRX_TYPE_LEN];
+    uint8_t tap_number;
+    char payload[BUFFER_SIZE];
+    char txid[TRXID_LEN];
+    uint32_t timestamp; // For expiration handling
+    uint32_t timeout_ms; //per-entry timeout duration
+} TransactionQueueEntry;
+
+extern TransactionQueueEntry trx_queue[QUEUE_SIZE];
+extern uint8_t queue_head;
+extern uint8_t queue_tail;
+extern uint8_t queue_count;
+
+extern String active_transaction_id[NUM_OF_TAPS];
+#define trxn_wait_time 80000UL
+
+
+
 
 
 

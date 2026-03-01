@@ -45,28 +45,28 @@ bool mqtt_publish(const char* topic, const char* payload) {
 /**
  * @function to send MPESA pay mqtt
  */
-void mqtt_publish_mpesa_pay(const char* phone,uint8_t tap_index , const char* amount) {
+void mqtt_publish_mpesa_pay(const char* phone,uint8_t tap_index , const char* amount, const char* tx_id) {
     char tap_index_str[3];
     char mqttmessage[BUFFER_SIZE];
     sprintf(tap_index_str, "%d", tap_index); // Convert tap index to string
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s%s%s",
-        "mpesapay",delim, sim_imei, delim, phone, delim, amount, delim, tap_index_str);
+        "%s%s%s%s%s%s%s%s%s%s%s",
+        "mpesapay",delim, sim_imei, delim,tx_id,delim, phone, delim, amount, delim, tap_index_str);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
     
 }
 /**
  * @function to send card pay mqtt
  */
-void mqtt_publish_card_pay(const char* card_id, uint8_t tap_index , const char* amount) {
+void mqtt_publish_card_pay(const char* card_id, uint8_t tap_index , const char* amount, const char* tx_id) {
     char tap_index_str[3];
     char mqttmessage[BUFFER_SIZE];
     sprintf(tap_index_str, "%d", tap_index); // Convert tap index to string
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s%s%s",
-        "cardpay",delim,sim_imei,delim,card_id,delim,tap_index_str,delim, amount);
+        "%s%s%s%s%s%s%s%s%s%s%s",
+        "cardpay",delim,sim_imei, tx_id, delim,card_id,delim,tap_index_str,delim, amount);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 /**
@@ -98,3 +98,28 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     // TODO: parse message and open/close taps accordingly
     // e.g. "open_1_100" → tap_open(1), set target_pulses
 }
+
+/**
+ * start ACK function
+ *  Payload: "ack_IMEI_type_TXID_tap_start_targetPulses"
+ */
+void mqtt_dispense_start_ack(String transactionType, String tapNumber,uint32_t targetPulses, String txid){
+    char mqttmessage[BUFFER_SIZE];
+    //construct the MQTT topic and message payload
+    snprintf(mqttmessage, BUFFER_SIZE, 
+        "%s_%s_%s_%s_%s_%s_%s",
+        "ack",sim_imei,transactionType,txid, tapNumber.c_str(),"start",String(targetPulses).c_str() );
+    publish_flag = mqtt_publish(topic_publish, mqttmessage); 
+}       
+/**
+ * start ACK function
+ *  Payload: "ack_IMEI_type_TXID_tap_start_targetPulses"
+ */
+void mqtt_dispense_complete_ack(String transactionType, String tapNumber,uint32_t dispPulses, String txid){
+    char mqttmessage[BUFFER_SIZE];
+    //construct the MQTT topic and message payload
+    snprintf(mqttmessage, BUFFER_SIZE, 
+        "%s_%s_%s_%s_%s_%s_%s",
+        "ack",sim_imei,transactionType,txid, tapNumber.c_str(),"complete", String(dispPulses).c_str() );
+    publish_flag = mqtt_publish(topic_publish, mqttmessage); 
+} 
