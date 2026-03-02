@@ -169,7 +169,7 @@ void handle_amount_input(char key) {
         }
     }else if(key == '#'){
         if(input_index > 0) { // Ensure there is some amount input before proceeding
-            if(active_transaction_type[selected_tap_index] == trxmpesapay) { 
+            if(strcmp(taps[selected_tap_index].transaction_type, trxmpesapay)==0) { 
                 char txid[TRXID_LEN];
                 generate_txid(txid);
 
@@ -195,7 +195,7 @@ void handle_amount_input(char key) {
                     homescreen();
                 }
             }
-            else if(active_transaction_type[selected_tap_index] == trxcardpay) { 
+            else if(strcmp(taps[selected_tap_index].transaction_type, trxcardpay) == 0) { 
                 char txid[TRXID_LEN];
                 generate_txid(txid);
                 mqtt_publish_card_pay(scanned_tag_id.c_str(), selected_tap_index, amount_buffer, txid); 
@@ -221,8 +221,11 @@ void handle_amount_input(char key) {
                 }
             }
             else if(rfid_initiated && selected_tap_index == -1) {
+                char txid[TRXID_LEN];
+                generate_txid(txid);
                 mqtt_publish_card_topup(scanned_tag_id.c_str(), phone_buffer, amount_buffer);  
                 if(publish_flag) {
+                    queue_enqueue(trxcardtopup, 255, txid); //255 - means no tap
                     lcd.clear();
                     lcd.blink_off();
                     lcddisplay("Top-up Initiated", "Please wait ...", "", ""); 

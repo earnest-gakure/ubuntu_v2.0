@@ -237,3 +237,23 @@ void card_topup_success(String cardbalance) {
   lcddisplay("", "TOP UP SUCCESS", "TOKENS BAL: " + cardbalance, "");
   delay(3000);
 }
+void Low_Balance_Screen() {
+  lcd.clear();
+  lcddisplay("LOW BALANCE", "", "PLEASE TOP UP", "");
+  delay(2000);
+}
+void tag_doesnt_exist_error_screen() {
+  lcd.clear();
+  lcddisplay("TAG DOESN'T EXIST", "PLEASE REGISTER TAG", "", "");
+  delay(3000);
+}
+void incomplete_trxn_error_screen() {
+  lcd.clear();
+  lcddisplay("TRANSACTION FAILED", "ENTER PIN CORRECTLY", "TRY AGAIN", "");
+  delay(3000);
+}
+void dispense_amount_error_screen() {
+  lcd.clear();
+  lcddisplay("ENTER THE CORRECT ", "DISPENSE AMOUNT", "", "");
+  delay(3000);
+}

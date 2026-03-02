@@ -42,6 +42,11 @@ void taps_init() {
         taps[i].pulse_count = 0;
         taps[i].target_pulses = 0;
         taps[i].pause_start_time = 0;
+        //strcpy(taps[0].transaction_type, "");
+        strcpy(taps[i].transaction_id, "");
+        strcpy(taps[i].transaction_type, "");
+
+        
 
         // Set pin modes
         pinMode(taps[i].motor_open_pin, OUTPUT);
@@ -93,9 +98,14 @@ void tap_close(uint8_t tap_index) {
     //reset state flags and counters
     taps[tap_index].running = false;
     taps[tap_index].paused = false;
+    taps[tap_index].pending_open = false;
     taps[tap_index].pulse_count = 0;
     taps[tap_index].target_pulses = 0;
     taps[tap_index].pause_start_time = 0;
+
+    
+    strcpy(taps[tap_index].transaction_id, "");
+    strcpy(taps[tap_index].transaction_type, "");
 
     //detach flowmeter interrupt to stop counting pulses
     detachInterrupt(digitalPinToInterrupt(taps[tap_index].flowmeter_pin));
@@ -186,15 +196,22 @@ void check_pause_timeouts() {
         }
     }
 }
+//strcpy(taps[0].transaction_type, trxcardpay);
 /**
  * @function to handle autoclose when target pulses are reached
- * @called from flowmeter ISRs to check if the tap should be closed after counting pulses
+ * void mqtt_dispense_complete_ack(String tapNumber,uint32_t dispPulses, String txid){
  * */
 void check_targetpulses_to_autoclose(){
     for (uint8_t i = 0; i < NUM_OF_TAPS; i++) {
         if(taps[i].running && !taps[i].paused) {
             if (taps[i].target_pulses > 0 && taps[i].pulse_count >= taps[i].target_pulses) {
                 tap_close(i);
+                mqtt_dispense_complete_ack(
+                    String(i),
+                    taps[i].pulse_count,
+                    taps[i].transaction_id
+                );
+
                 Serial.print("Tap ");
                 Serial.print(i);
                 Serial.println(" automatically closed after reaching target pulses.");

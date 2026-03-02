@@ -15,7 +15,6 @@ TransactionQueueEntry trx_queue[QUEUE_SIZE];
 uint8_t queue_head = 0;
 uint8_t queue_tail = 0;
 uint8_t queue_count = 0;
-String active_transaction_id[NUM_OF_TAPS] = {"", "", "", ""}; 
 
 
 /**
@@ -46,7 +45,7 @@ bool queue_is_empty() {
     return queue_count == 0;
 }
 /**
- * @function to add new pendoing transaction to the queue
+ * @function to add new pending transaction to the queue
  * returns true if added successfully, false if queue is full
  */
 bool queue_enqueue(const char* trx_type, uint8_t tap_num, const char* txid) {
@@ -142,8 +141,13 @@ void queue_check_timeout(){
                 Serial.println(entry.txid);
 
                 uint8_t tap_num = entry.tap_number;
-                taps[tap_num].pending_open = false;
-                digitalWrite(taps[tap_num].led_pin, LOW);
+
+                if(tap_num != NO_TAP){
+                    taps[tap_num].pending_open = false;
+                    digitalWrite(taps[tap_num].led_pin, LOW);
+                    strcpy(taps[tap_num].transaction_id, "");
+                    strcpy(taps[tap_num].transaction_type, "");
+                }
                 queue_dequeue_slot(i);
             }
         }
@@ -202,24 +206,27 @@ void process_queue(){
         if(trxstatus == "1"){
             taps[tap_num].target_pulses = checkpulses.toInt();
             status_1_screen();
-            active_transaction_id[tap_num]   = token_ptrs[2];
-            active_transaction_type[tap_num] = token_ptrs[0];
+            //strcpy(taps[0].transaction_type, trxcardpay);
+            strcpy(taps[tap_num].transaction_id, token_ptrs[2]);
+            strcpy(taps[tap_num].transaction_type, token_ptrs[0]);
 
             tap_open(tap_num);
             mqtt_dispense_start_ack(
-                active_transaction_type[tap_num],   // "mpesapay"
+                taps[tap_num].transaction_type,   // "mpesapay"
                 token_ptrs[5],                      // tap number string from payload
                 taps[tap_num].target_pulses,        // uint32_t pulses
-                active_transaction_id[tap_num]      // txid
+                taps[tap_num]. transaction_id    // txid
             );
         }else{
             taps[tap_num].pending_open = false;
+
             if      (trxstatus == "2") { errorbeep(); status_2_screen(); }
             else if (trxstatus == "3") { errorbeep(); status_3_screen(); }
             else if (trxstatus == "4") { errorbeep(); status_4_screen(); }
             else if (trxstatus == "5") { errorbeep(); status_5_screen(); }
             else if (trxstatus == "6") { errorbeep(); status_6_screen(); }
             else if (trxstatus == "7") { errorbeep(); status_7_screen(); }
+            else if (trxstatus == "8") { errorbeep(); status_8_screen(); }
         }
     }
     // ── CARD PAY response ──
@@ -233,20 +240,49 @@ void process_queue(){
         if(card_status == "1"){
             taps[tap_num].target_pulses = checkpulses.toInt();
             card_pay_success(cardbalance);
-            active_transaction_id[tap_num]   = token_ptrs[4];
-            active_transaction_type[tap_num] = token_ptrs[0];
+            strcpy(taps[tap_num].transaction_id, token_ptrs[4]);
+            strcpy(taps[tap_num].transaction_type,token_ptrs[0]);
 
             tap_open(tap_num);
 
             //Payload: "ack_IMEI_type_TXID_tap_start_targetPulses"
             //(String transactionType, String tapNumber,uint32_t targetPulses, String txid)
             mqtt_dispense_start_ack(
-                    active_transaction_type[tap_num],
+                    taps[tap_num].transaction_type,
                     token_ptrs[3],
                     taps[tap_num].target_pulses,
-                    active_transaction_id[tap_num]
+                    taps[tap_num].transaction_id
                 );
+        }else{
+            taps[tap_num].pending_open = false;
+            if (card_status == "2") { errorbeep(); Low_Balance_Screen(); }
+            else if (card_status == "3") { errorbeep(); tag_doesnt_exist_error_screen(); }
+            else if (card_status == "4") { errorbeep(); incomplete_trxn_error_screen(); }
+            else if (card_status == "5") { errorbeep(); dispense_amount_error_screen(); }
+            
         }
+    }
+    // ── Card top up response ──@cardtopup_863576043526289_RTG289_731d526_0757900477_1_1_73
+    // Expected tokens: cardtopup_IMEI_phone_amount_txid_status_pulses
+    //   [0]=cardtopup [1]=IMEI [2]=trx_id [3]=CARD ID [3]=trx_id 
+    //   [4]= amount [5]=status [6]balance
+    else if(trx_type == trxcardtopup){
+        String cardbalance = token_ptrs[6];
+        String card_status = token_ptrs[5];
+        if(card_status == "1"){
+            successbeep();
+            card_topup_success(cardbalance);
+        }
+        else if(card_status == "2"){ errorbeep(); status_2_screen();  }
+        else if(card_status == "3"){ errorbeep(); status_3_screen();  }
+        else if(card_status == "4"){ errorbeep(); status_4_screen();  }
+        else if(card_status == "5"){ errorbeep(); status_5_screen();  }
+        else if(card_status == "6"){ errorbeep(); status_6_screen();  }
+        else if(card_status == "7"){ errorbeep(); status_7_screen();  }
+        else if(card_status == "8"){ errorbeep(); status_8_screen();  }
+        
+
+
     }
     homescreen();
     //LOOK AT THIS LATER

@@ -38,7 +38,7 @@ void Mqtt_Broker_Connect_Buzz() {  //Indicate that a connection to the broker ha
 }
 
 void successbeep() {
-  for (int x = 0; x < 2; x++) {
+  for (int x = 0; x < 1; x++) {
     digitalWrite(buzzer_pin, HIGH);
     delay(40);
     digitalWrite(buzzer_pin, LOW);

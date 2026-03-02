@@ -99,6 +99,9 @@ typedef struct {
     volatile uint32_t pulse_count;
     uint32_t          target_pulses;
     unsigned long     pause_start_time;
+
+    char transaction_type[15];
+    char transaction_id[15];
 } Tap;
 
 extern Tap taps[NUM_OF_TAPS];
@@ -143,13 +146,13 @@ extern char trxcardtopup[10];
 extern char trxmpesapay[9];
 extern char trxremotedispense[15];
 
-extern String active_transaction_type[NUM_OF_TAPS];
+
 
 //
 extern bool led_blink_state;
 
 //QUEUE
-#define QUEUE_SIZE 4
+#define QUEUE_SIZE 10
 #define TRX_TYPE_LEN 20
 #define TRXID_LEN 7
 
@@ -175,8 +178,9 @@ extern uint8_t queue_head;
 extern uint8_t queue_tail;
 extern uint8_t queue_count;
 
-extern String active_transaction_id[NUM_OF_TAPS];
+
 #define trxn_wait_time 80000UL
+#define NO_TAP 255
 
 
 
