@@ -90,7 +90,7 @@ bool queue_enqueue(const char* trx_type, uint8_t tap_num, const char* txid) {
 bool queue_store_response(const char* txid, const char* payload){
     for(uint8_t i=0; i < QUEUE_SIZE ; i++){
         TransactionQueueEntry &entry = trx_queue[i];
-        if(entry.state == QSTATE_PENDING && strncmp(entry.txid, txid, TRXID_LEN) == 0){
+        if(entry.state == QSTATE_PENDING && strncmp(entry.txid, txid, TRXID_LEN - 1) == 0){
             entry.state = QSTATE_RECEIVED;
             strncpy(entry.payload, payload, BUFFER_SIZE - 1);
             Serial.print(F("Response stored: txid="));
@@ -155,6 +155,7 @@ void queue_check_timeout(){
  * called in loop or STATE IDLE
  */
 void process_queue(){
+    if(queue_is_empty()) return;
     for(uint8_t i = 0; i < QUEUE_SIZE ; i++){
         TransactionQueueEntry &entry = trx_queue[i];
         if(entry.state != QSTATE_RECEIVED)continue; //skip current slot
@@ -201,13 +202,13 @@ void process_queue(){
         if(trxstatus == "1"){
             taps[tap_num].target_pulses = checkpulses.toInt();
             status_1_screen();
-            active_transaction_id[tap_num]   = token_ptrs[5];
+            active_transaction_id[tap_num]   = token_ptrs[2];
             active_transaction_type[tap_num] = token_ptrs[0];
 
             tap_open(tap_num);
             mqtt_dispense_start_ack(
                 active_transaction_type[tap_num],   // "mpesapay"
-                token_ptrs[4],                      // tap number string from payload
+                token_ptrs[5],                      // tap number string from payload
                 taps[tap_num].target_pulses,        // uint32_t pulses
                 active_transaction_id[tap_num]      // txid
             );
@@ -245,8 +246,6 @@ void process_queue(){
                     taps[tap_num].target_pulses,
                     active_transaction_id[tap_num]
                 );
-            tap_open(i);
-
         }
     }
     homescreen();

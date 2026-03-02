@@ -40,5 +40,6 @@ void loop() {
     check_for_rfid_tags(); // Check for RFID tag presence and read its ID to update state machine variables accordingly
 
     process_queue();
+    queue_check_timeout();
 
 }

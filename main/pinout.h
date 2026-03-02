@@ -151,7 +151,7 @@ extern bool led_blink_state;
 //QUEUE
 #define QUEUE_SIZE 4
 #define TRX_TYPE_LEN 20
-#define TRXID_LEN 8
+#define TRXID_LEN 7
 
 //QUE ENTRY STATES
 #define QSTATE_EMPTY 0

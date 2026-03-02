@@ -178,7 +178,7 @@ void handle_amount_input(char key) {
                     queue_enqueue(trxmpesapay, selected_tap_index, txid);
                     lcd.clear();
                     lcd.blink_off();
-                    lcddisplay("Payment Initiated", "Please complete", "payment on your phone", ""); 
+                    lcddisplay("Payment Initiated..", "", "complete payment ", "  on your phone"); 
                     delay(3000);
                     taps[selected_tap_index].pending_open = true;
                     reset_input_buffer();
@@ -227,6 +227,7 @@ void handle_amount_input(char key) {
                     lcd.blink_off();
                     lcddisplay("Top-up Initiated", "Please wait ...", "", ""); 
                     delay(3000);
+                    reset_input_buffer();
                     current_state = HOME_IDLE; 
                     homescreen();
                 }

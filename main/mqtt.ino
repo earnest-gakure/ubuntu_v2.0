@@ -65,8 +65,8 @@ void mqtt_publish_card_pay(const char* card_id, uint8_t tap_index , const char* 
     sprintf(tap_index_str, "%d", tap_index); // Convert tap index to string
     //construct the MQTT topic and message payload
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s%s%s%s%s",
-        "cardpay",delim,sim_imei, tx_id, delim,card_id,delim,tap_index_str,delim, amount);
+    "%s%s%s%s%s%s%s%s%s%s%s",
+    "cardpay", delim, sim_imei, delim, tx_id, delim, card_id, delim, tap_index_str, delim, amount);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 /**
@@ -96,7 +96,21 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     SerialMon.println(message);
 
     // TODO: parse message and open/close taps accordingly
-    // e.g. "open_1_100" → tap_open(1), set target_pulses
+    //extract txid  and queue
+    char msg_copy[BUFFER_SIZE];
+    strncpy(msg_copy, message, BUFFER_SIZE - 1); //remove \0
+
+    char *token[10];
+    uint8_t tc = 0;
+    memset(token, 0 , sizeof(token));
+    char *tok = strtok(msg_copy, "_");
+    while(tok != NULL && tc <10){
+        token[tc++] = tok;
+        tok = strtok(NULL, "_");
+    }
+
+    //queue the txid and the payload
+    queue_store_response(token[2], message);
 }
 
 /**
