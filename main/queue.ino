@@ -141,14 +141,17 @@ void queue_check_timeout(){
                 Serial.println(entry.txid);
 
                 uint8_t tap_num = entry.tap_number;
-
+                
+                //clear tap if not card top up
                 if(tap_num != NO_TAP){
                     taps[tap_num].pending_open = false;
                     digitalWrite(taps[tap_num].led_pin, LOW);
                     strcpy(taps[tap_num].transaction_id, "");
                     strcpy(taps[tap_num].transaction_type, "");
                 }
+
                 queue_dequeue_slot(i);
+
             }
         }
     }
@@ -198,9 +201,9 @@ void process_queue(){
 
         // ── MPESA PAY response ──
         //@mpesapay_863576043526289_0757900477_1_2_3_0
-    // Expected tokens: mpesapay_IMEI_phone_amount_tap_txid_status_pulses
+    // Expected tokens: mpesapay_IMEI_txid_phone_amount_tap_status_pulses
     //   [0]=mpesapay [1]=IMEI [2]=txid [3]=phone [4]=amount
-    //   [4]=tap  [6]=status [7]=pulses
+    //   [5]=tap  [6]=status [7]=pulses
     if(trx_type == trxmpesapay){
         String trxstatus = token_ptrs[6];
         String checkpulses = token_ptrs[7];
@@ -220,6 +223,7 @@ void process_queue(){
             );
         }else{
             taps[tap_num].pending_open = false;
+            digitalWrite(taps[tap_num].led_pin, LOW);  //ensure led is off          
 
             if      (trxstatus == "2") { errorbeep(); status_2_screen(); }
             else if (trxstatus == "3") { errorbeep(); status_3_screen(); }
@@ -259,6 +263,7 @@ void process_queue(){
                 );
         }else{
             taps[tap_num].pending_open = false;
+            digitalWrite(taps[tap_num].led_pin, LOW); //ensure LED is off
             if (card_status == "2") { errorbeep(); Low_Balance_Screen(); }
             else if (card_status == "3") { errorbeep(); tag_doesnt_exist_error_screen(); }
             else if (card_status == "4") { errorbeep(); incomplete_trxn_error_screen(); }

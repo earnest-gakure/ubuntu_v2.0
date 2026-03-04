@@ -21,6 +21,7 @@ void setup() {
     gsm_init();
     initBarChars();
     build_mqtt_topics();
+    heartbeat_init();
     homescreen();
     
 }
@@ -42,5 +43,6 @@ void loop() {
 
     process_queue();
     queue_check_timeout();
+    heartbeat_check();
 
 }

@@ -149,6 +149,11 @@ extern char trxcardpay[8];
 extern char trxcardtopup[10];
 extern char trxmpesapay[9];
 
+extern char topic_publish[64];
+extern char topic_subscribe[64];
+extern char topic_ack_publish[64];
+
+
 
 
 //

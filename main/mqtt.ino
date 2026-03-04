@@ -142,3 +142,11 @@ void mqtt_dispense_complete_ack(String tapNumber,uint32_t dispPulses, const char
         "ack",sim_imei,txid, tapNumber.c_str(),"complete", String(dispPulses).c_str() );
     publish_flag = mqtt_publish(topic_publish, mqttmessage); 
 } 
+
+/**
+ * function to publish heartbeats
+ */
+bool mqtt_publish_heartbeat(const char *topic, const char *payload) {
+  if (!mqtt.connected()) return false;
+  return mqtt.publish(topic, payload, false);
+}
