@@ -222,8 +222,10 @@ void process_queue(){
                 taps[tap_num]. transaction_id    // txid
             );
         }else{
+            noInterrupts(); //prevent led from reseting flag
             taps[tap_num].pending_open = false;
-            digitalWrite(taps[tap_num].led_pin, LOW);  //ensure led is off          
+            digitalWrite(taps[tap_num].led_pin, LOW);  //ensure led is off 
+            interrupts();         
 
             if      (trxstatus == "2") { errorbeep(); status_2_screen(); }
             else if (trxstatus == "3") { errorbeep(); status_3_screen(); }
@@ -262,8 +264,10 @@ void process_queue(){
                     taps[tap_num].transaction_id
                 );
         }else{
+            noInterrupts();
             taps[tap_num].pending_open = false;
             digitalWrite(taps[tap_num].led_pin, LOW); //ensure LED is off
+            interrupts();
             if (card_status == "2") { errorbeep(); Low_Balance_Screen(); }
             else if (card_status == "3") { errorbeep(); tag_doesnt_exist_error_screen(); }
             else if (card_status == "4") { errorbeep(); incomplete_trxn_error_screen(); }
