@@ -197,9 +197,10 @@ void process_queue(){
         queue_dequeue_slot(i);
 
         // ── MPESA PAY response ──
+        //@mpesapay_863576043526289_0757900477_1_2_3_0
     // Expected tokens: mpesapay_IMEI_phone_amount_tap_txid_status_pulses
-    //   [0]=mpesapay [1]=IMEI [2]=phone [3]=amount
-    //   [4]=tap      [5]=txid [6]=status [7]=pulses
+    //   [0]=mpesapay [1]=IMEI [2]=txid [3]=phone [4]=amount
+    //   [4]=tap  [6]=status [7]=pulses
     if(trx_type == trxmpesapay){
         String trxstatus = token_ptrs[6];
         String checkpulses = token_ptrs[7];
@@ -230,7 +231,10 @@ void process_queue(){
         }
     }
     // ── CARD PAY response ──
-    // Expected tokens: cardpay_IMEI_cardID_tap_txid_balance_status_pulses
+    //PUBLISH topic: atm/transactions/863576043526289 : cardpay_863576043526289_LRF802_333d713_0_100
+    //Enqueued: cardpay tap=0 txid=LRF802
+    //[MQTT] Received on atm/commands/863576043526289: @cardpay_863576043526289_LRF802_333d713_0_3_0
+    // Expected tokens: cardpay_IMEI_txid_cardID_tap_balance_status_pulses
     //   [0]=cardpay [1]=IMEI [2]=cardID [3]=tap
     //   [4]=txid    [5]=balance [6]=status [7]=pulses
     else if(trx_type == trxcardpay){
@@ -263,12 +267,12 @@ void process_queue(){
         }
     }
     // ── Card top up response ──@cardtopup_863576043526289_RTG289_731d526_0757900477_1_1_73
-    // Expected tokens: cardtopup_IMEI_phone_amount_txid_status_pulses
-    //   [0]=cardtopup [1]=IMEI [2]=trx_id [3]=CARD ID [3]=trx_id 
-    //   [4]= amount [5]=status [6]balance
+    // Expected tokens: cardtopup_IMEI_txid_cardid_phone_amount_status_balance
+    //   [0]=cardtopup [1]=IMEI [2]=trx_id [3]=CARD ID 
+    //   [4]= phone [5]= amount [6]=status [7]balance
     else if(trx_type == trxcardtopup){
-        String cardbalance = token_ptrs[6];
-        String card_status = token_ptrs[5];
+        String cardbalance = token_ptrs[7];
+        String card_status = token_ptrs[6];
         if(card_status == "1"){
             successbeep();
             card_topup_success(cardbalance);

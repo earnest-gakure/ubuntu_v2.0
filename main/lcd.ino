@@ -164,6 +164,15 @@ void homescreen() {
 
   lcd.clear();
   lcddisplay("Tap Tag", "", "Enter Phone Number", "");
+
+  //show network bars
+  lcd.setCursor(19,0);
+  if(signal_no_reading){
+    lcd.write('X');
+
+  }else{
+    lcd.write(byte(current_signal_bars));
+  }
 }
 
 

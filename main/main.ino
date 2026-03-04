@@ -19,6 +19,7 @@ void setup() {
     timer_init();
 
     gsm_init();
+    initBarChars();
     build_mqtt_topics();
     homescreen();
     

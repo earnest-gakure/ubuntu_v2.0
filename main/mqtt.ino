@@ -12,7 +12,7 @@ bool publish_flag = false;
 char trxcardpay[8] = "cardpay";
 char trxcardtopup[10] = "cardtopup";
 char trxmpesapay[9] = "mpesapay";
-char trxremotedispense[15] = "remotedispense";
+
 
 
 
@@ -72,12 +72,16 @@ void mqtt_publish_card_pay(const char* card_id, uint8_t tap_index , const char* 
 /**
  * @function to send card topup mqtt
  */
-void mqtt_publish_card_topup(const char* card_id, const char* phone, const char* amount) {
+void mqtt_publish_card_topup(const char* card_id, const char* phone, const char* amount, const char* tx_id) {
     char mqttmessage[BUFFER_SIZE];
     //construct the MQTT topic and message payload
+    // ── Card top up response ──@cardtopup_863576043526289_RTG289_731d526_0757900477_1_1_73
+    // Expected tokens: cardtopup_IMEI_txid_cardid_phone_amount_status_balance
+    //   [0]=cardtopup [1]=IMEI [2]=trx_id [3]=CARD ID 
+    //   [4]= phone [5]= amount [6]=status [7]balance
     snprintf(mqttmessage, BUFFER_SIZE, 
-        "%s%s%s%s%s%s%s%s%s",
-        "cardtopup",delim,sim_imei,delim, card_id,delim, phone,delim, amount);
+        "%s%s%s%s%s%s%s%s%s%s%s",
+        "cardtopup",delim,sim_imei,delim,tx_id,delim, card_id,delim, phone,delim, amount);
     publish_flag = mqtt_publish(topic_publish, mqttmessage);   
 }
 

@@ -11,6 +11,10 @@
 #define SerialMon Serial
 #define SerialAT  Serial2
 
+//network bars 
+extern uint8_t current_signal_bars;
+extern bool signal_no_reading;
+
 
 #include <stdio.h>
 #include <stdint.h>
@@ -144,7 +148,6 @@ extern bool publish_flag;
 extern char trxcardpay[8];
 extern char trxcardtopup[10];
 extern char trxmpesapay[9];
-extern char trxremotedispense[15];
 
 
 
@@ -152,8 +155,8 @@ extern char trxremotedispense[15];
 extern bool led_blink_state;
 
 //QUEUE
-#define QUEUE_SIZE 10
-#define TRX_TYPE_LEN 20
+#define QUEUE_SIZE 8
+#define TRX_TYPE_LEN 10
 #define TRXID_LEN 7
 
 //QUE ENTRY STATES

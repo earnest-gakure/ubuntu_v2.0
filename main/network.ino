@@ -51,6 +51,8 @@ static const uint32_t SOFT_RETRY_DELAY_MS  = 10000UL;
 static uint32_t phase_start = 0;
 
 char sim_imei[17] = "";
+uint8_t current_signal_bars = 0;
+bool signal_no_reading = true;
 
 // ═══════════════════════════════════════════════════════════════
 //  Forward declarations of internal helpers
@@ -175,10 +177,14 @@ void gsm_update() {
             last_heartbeat = now;
             bool net  = modem.isNetworkConnected();
             bool gprs = modem.isGprsConnected();
-            SerialMon.print(F("[GSM] Heartbeat – Network: "));
-            SerialMon.print(net  ? F("OK") : F("DOWN"));
-            SerialMon.print(F("  GPRS: "));
-            SerialMon.println(gprs ? F("OK") : F("DOWN"));
+            int rssi  = modem.getSignalQuality();
+
+            displaySignalBars(rssi);
+
+            // SerialMon.print(F("[GSM] Heartbeat – Network: "));
+            // SerialMon.print(net  ? F("OK") : F("DOWN"));
+            // SerialMon.print(F("  GPRS: "));
+            // SerialMon.println(gprs ? F("OK") : F("DOWN"));
 
             if (!net || !gprs) {
                 SerialMon.println(F("[GSM] Link lost → reconnecting"));
@@ -239,6 +245,54 @@ void gsm_update() {
         break;
     }
 }
+/**
+ * @function to create network bars
+ * called in set up
+ * 
+ */
+void initBarChars() {
+  byte barGraph[5][8] = {
+    {B01100, B01100, B01100, B01100, B01100, B00000, B01100, B01100},
+    {B00000, B00000, B00000, B00000, B11000, B11000, B11000, B11000},
+    {B00000, B00000, B00110, B00110, B00110, B11110, B11110, B11110},
+    {B00000, B00000, B00011, B00011, B01111, B01111, B11111, B11111},
+    {B00011, B00011, B00111, B00111, B01111, B01111, B11111, B11111}
+  };
+  
+  for (int i = 0; i < 5; i++) {
+    lcd.createChar(i, barGraph[i]);
+  }
+}
+/**
+ * @brief Takes raw RSSI value, converts to bars, and updates LCD display
+ * @param rssi Raw RSSI value from modem.getSignalQuality()
+ */
+void displaySignalBars(int rssi) {
+    if(rssi == 99 || rssi <= 0){
+        signal_no_reading = true;
+        current_signal_bars = 0;
+    }else{
+        signal_no_reading = false;
+        // Convert RSSI to bar count
+        if      (rssi >= 20 && rssi <= 31) current_signal_bars = 4;  // Excellent
+        else if (rssi >= 15 && rssi <= 19) current_signal_bars = 3;  // Good
+        else if (rssi >= 10 && rssi <= 14) current_signal_bars = 2;  // Fair
+        else if (rssi >= 2  && rssi <= 9 ) current_signal_bars = 1;  // Weak
+        else                               current_signal_bars = 0;  // No signal (covers 99, 0, -1)
+
+    }
+
+    //show network bars
+  lcd.setCursor(19,0);
+  if(signal_no_reading){
+    lcd.write('X');
+
+  }else{
+    lcd.write(byte(current_signal_bars));
+  }
+
+}
+
 
 /**
  * @brief Returns true when the modem is registered and GPRS is up.
@@ -280,3 +334,4 @@ static void _get_imei() {
     SerialMon.println(sim_imei);
     build_mqtt_topics(); // Now that we have the IMEI, build the MQTT topics
 }
+
