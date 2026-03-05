@@ -17,8 +17,8 @@ void setup() {
     loading_screen();
     state_machine_init();
     timer_init();
-
     gsm_init();
+    delay(500);
     initBarChars();
     build_mqtt_topics();
     heartbeat_init();

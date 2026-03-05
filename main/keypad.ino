@@ -281,6 +281,13 @@ void reset_input_buffer(){
     memset(phone_buffer, 0, sizeof(phone_buffer)); 
     input_index = 0; 
     memset(amount_buffer, 0, sizeof(amount_buffer)); 
+
+    //reset transaction type
+    if(selected_tap_index >=0 && selected_tap_index < NUM_OF_TAPS){
+        strcpy(taps[selected_tap_index].transaction_type, "");
+        strcpy(taps[selected_tap_index].transaction_id, "");
+        taps[selected_tap_index].pending_open = false;
+    }
     selected_tap_index = -1; 
     rfid_initiated = false; 
     tag_scanned = false; 

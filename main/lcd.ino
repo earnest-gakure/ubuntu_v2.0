@@ -163,7 +163,7 @@ void homescreen() {
   lcd.blink_off();
 
   lcd.clear();
-  lcddisplay("Tap Tag", "", "Enter Phone Number", "");
+  lcddisplay("Tap Tag ", "", "Enter Phone Number", "");
 
   //show network bars
   lcd.setCursor(19,0);

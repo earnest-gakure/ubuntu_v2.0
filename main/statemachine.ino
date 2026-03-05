@@ -18,6 +18,11 @@ void state_machine_init() {
   memset(phone_buffer, 0, sizeof(phone_buffer));
   memset(amount_buffer, 0, sizeof(amount_buffer));
   input_index = 0;
+  if(selected_tap_index >= 0 && selected_tap_index < NUM_OF_TAPS) {
+        strcpy(taps[selected_tap_index].transaction_type, "");
+        strcpy(taps[selected_tap_index].transaction_id, "");
+        taps[selected_tap_index].pending_open = false;
+    }
   selected_tap_index = -1;
   tag_scanned = false; // Reset the tag scanned flag
   rfid_initiated = false; // Reset the RFID initiated flag
