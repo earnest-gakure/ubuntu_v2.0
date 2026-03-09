@@ -5,6 +5,11 @@
 #include "pinout.h"
 Tap taps[NUM_OF_TAPS];
 #define debounce 100
+// Raw flags set by ISR, debounced in main loop
+volatile bool raw_button_pressed[NUM_OF_TAPS] = {false, false, false, false};
+volatile uint32_t button_press_time[NUM_OF_TAPS] = {0, 0, 0, 0};
+#define DEBOUNCE_MS 50
+
 
 // Button state tracking
 bool D1_state = HIGH;
@@ -188,7 +193,11 @@ void check_pause_timeouts() {
         if(taps[i].running && taps[i].paused) {
             if (current_time - taps[i].pause_start_time >= PAUSE_TIMEOUT) {
                 //close tap and reset flags and counters
+                uint32_t final_pulses = taps[i].pulse_count;
+                char saved_txid[TRXID_LEN];
+                strncpy(saved_txid, taps[i].transaction_id, TRXID_LEN);
                 tap_close(i);
+                mqtt_dispense_complete_ack(String(i), final_pulses, saved_txid);
                 Serial.print("Tap ");
                 Serial.print(i);
                 Serial.println(" automatically closed due to pause timeout.");
@@ -205,12 +214,13 @@ void check_targetpulses_to_autoclose(){
     for (uint8_t i = 0; i < NUM_OF_TAPS; i++) {
         if(taps[i].running && !taps[i].paused) {
             if (taps[i].target_pulses > 0 && taps[i].pulse_count >= taps[i].target_pulses) {
+                // Save everything needed BEFORE closing
+                uint32_t final_pulses = taps[i].pulse_count;
+                char saved_txid[TRXID_LEN];
+                strncpy(saved_txid, taps[i].transaction_id, TRXID_LEN);
                 tap_close(i);
-                mqtt_dispense_complete_ack(
-                    String(i),
-                    taps[i].pulse_count,
-                    taps[i].transaction_id
-                );
+                mqtt_dispense_complete_ack(String(i), final_pulses, saved_txid);
+                
 
                 Serial.print("Tap ");
                 Serial.print(i);
@@ -219,6 +229,30 @@ void check_targetpulses_to_autoclose(){
         }
     }
 }
+// //function to handle debounce and set button pressed flag
+// void check_button_debounce() {
+//     uint32_t now = millis();
+//     for (uint8_t i = 0; i < NUM_OF_TAPS; i++) {
+//         if (raw_button_pressed[i]) {
+//             if (now - button_press_time[i] >= DEBOUNCE_MS) {
+//                 if (!taps[i].button_pressed) {
+//                     taps[i].button_pressed = true;
+//                     Serial.print(F("Button pressed: tap "));
+//                     Serial.println(i);
+//                 }
+//                 raw_button_pressed[i] = false;  // clear raw flag
+//             }
+//         }
+//     }
+// }
+
+// ISR(PCINT2_vect) {
+//     if (!digitalRead(A8)) { raw_button_pressed[0] = true; button_press_time[0] = millis(); }
+//     if (!digitalRead(A9)) { raw_button_pressed[1] = true; button_press_time[1] = millis(); }
+//     if (!digitalRead(A10)){ raw_button_pressed[2] = true; button_press_time[2] = millis(); }
+//     if (!digitalRead(A11)){ raw_button_pressed[3] = true; button_press_time[3] = millis(); }
+// }
+
 
 // Pin change interrupt for tap buttons
 ISR(PCINT2_vect) {

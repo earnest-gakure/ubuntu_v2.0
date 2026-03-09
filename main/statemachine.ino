@@ -37,10 +37,10 @@ void check_state_timeouts() {
    if(current_state != HOME_IDLE && elapsed > STATEMACHINE_TIMEOUT) { // If not in HOME_IDLE and more than 60 seconds have passed
         state_machine_init(); // Reset the state machine to HOME_IDLE
         lcd.clear();
-        lcddisplay("Session Timeout", "Please Try Again", "", ""); // Update the LCD to show timeout message
-        delay(3000); // Wait for 3 seconds to allow the user to read the timeout message
+        //lcddisplay("Session Timeout", "Please Try Again", "", ""); // Update the LCD to show timeout message
+        //delay(3000); // Wait for 3 seconds to allow the user to read the timeout message
         homescreen(); // Update the LCD to show the home screen
-        Serial.println("State machine reset to HOME_IDLE due to timeout."); // Log the timeout event
+        //Serial.println("State machine reset to HOME_IDLE due to timeout."); // Log the timeout event
     }   
 }
 

@@ -163,7 +163,9 @@ void homescreen() {
   lcd.blink_off();
 
   lcd.clear();
-  lcddisplay("Tap Tag ", "", "Enter Phone Number", "");
+  lcddisplay("","Tap To Pay or TOP-UP" , "", "Key Phone For MPESA");
+  //lcddisplay( "","To Pay","   Tap Tag", "   Enter Phone N0");
+
 
   //show network bars
   lcd.setCursor(19,0);

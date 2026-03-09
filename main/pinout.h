@@ -25,10 +25,10 @@ extern bool signal_no_reading;
 #include <TinyGsmClient.h>
 #include <PubSubClient.h>
 
-// ── Modem selection ───────────────────────────────────────────
-#define TINY_GSM_MODEM_SIM800
-#define SerialMon Serial
-#define SerialAT  Serial2
+// // ── Modem selection ───────────────────────────────────────────
+// #define TINY_GSM_MODEM_SIM800
+// #define SerialMon Serial
+// #define SerialAT  Serial2
 
 // ── APN / credentials ─────────────────────────────────────────
 const char apn[]      = "iot.safaricom.com";

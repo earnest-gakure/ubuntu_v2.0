@@ -269,9 +269,7 @@ void process_queue(){
             digitalWrite(taps[tap_num].led_pin, LOW); //ensure LED is off
             interrupts();
             if (card_status == "2") { errorbeep(); Low_Balance_Screen(); }
-            else if (card_status == "3") { errorbeep(); tag_doesnt_exist_error_screen(); }
-            else if (card_status == "4") { errorbeep(); incomplete_trxn_error_screen(); }
-            else if (card_status == "5") { errorbeep(); dispense_amount_error_screen(); }
+            else if (card_status == "3") { errorbeep(); dispense_amount_error_screen(); }
             
         }
     }

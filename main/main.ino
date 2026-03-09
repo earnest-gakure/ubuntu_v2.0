@@ -6,6 +6,7 @@
 
 void setup() {
     Serial.begin(115200);
+    randomSeed(analogRead(A0));  // floating pin gives noisy seed
     buzzerinit();
     taps_init();
     buttons_init();
@@ -29,7 +30,9 @@ void loop() {
 
     //gsm updating
     gsm_update(); // Drives the GSM connection state machine (non-blocking)
+    
     //tap management
+
     check_pause_buttons();   // Check if any running taps have their button pressed to pause them
     check_resume_buttons();  // Check if any paused taps have their button pressed to resume them
     check_pause_timeouts();  // Check if any paused taps have exceeded the pause timeout to automatically close them
